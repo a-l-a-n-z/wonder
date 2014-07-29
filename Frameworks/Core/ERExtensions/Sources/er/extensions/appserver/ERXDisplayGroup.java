@@ -21,9 +21,7 @@ import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSMutableDictionary;
 import com.webobjects.foundation.NSMutableSet;
 import com.webobjects.foundation.NSSet;
-import com.webobjects.foundation._NSArrayUtilities;
 
-import er.extensions.batching.ERXBatchingDisplayGroup;
 import er.extensions.eof.ERXEOAccessUtilities;
 import er.extensions.eof.ERXS;
 
@@ -115,7 +113,7 @@ public class ERXDisplayGroup<T> extends WODisplayGroup {
 	}
 	
 	/**
-	 * Will return the qualifier set by "setQualifierForKey()" if it exists. Null returns otherwise.
+	 * Will return the qualifer set by "setQualifierForKey()" if it exists. Null returns otherwise.
 	 * @param key
 	 * @return
 	 */
@@ -207,32 +205,11 @@ public class ERXDisplayGroup<T> extends WODisplayGroup {
 	}
 
 	@Override
-	public void setSelectedObjects(NSArray objects) {
+	public void setSelectedObjects(NSArray nsarray) {
 		if(log.isDebugEnabled()) {
-			log.debug("setSelectedObjects@" + hashCode()  + ":" + (objects != null ? objects.count() : "0"));
+			log.debug("setSelectedObjects@" + hashCode()  + ":" + (nsarray != null ? nsarray.count() : "0"));
 		}
-		if (this instanceof ERXBatchingDisplayGroup) {
-			// keep previous behavior
-			// CHECKME a batching display group has its own _displayedObjects variable so setSelectionIndexes won't work
-			super.setSelectedObjects(objects);
-		} else {
-			// jw: don't call super as it does not call setSelectionIndexes as advertised in its
-			// javadocs and thus doesn't invoke events on the delegate
-			// we need to access the private field _displayedObjects directly as we would get
-			// wrong indexes when calling displayedObjects()
-			NSMutableArray displayedObjects;
-			try {
-				displayedObjects = (NSMutableArray) displayedObjectsField.get(this);
-			}
-			catch (IllegalArgumentException e) {
-				throw NSForwardException._runtimeExceptionForThrowable(e);
-			}
-			catch (IllegalAccessException e) {
-				throw NSForwardException._runtimeExceptionForThrowable(e);
-			}
-			NSArray<Integer> newSelection = _NSArrayUtilities.indexesForObjectsIndenticalTo(displayedObjects, objects);
-			setSelectionIndexes(newSelection);
-		}
+		super.setSelectedObjects(nsarray);
 	}
 
 	@Override
